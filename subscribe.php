@@ -11,22 +11,30 @@ class Subscribe extends Config
 {
     public function subscribeGroups ($groups)
     {
-        var_dump (file('subscribeGroups.txt'));
-        $subscribeGroups = file('subscribeGroups.txt');
+        $file = 'subscribeGroups.txt';
+
+        // var_dump (file('subscribeGroups.txt'));
+
+        // $subscribeGroups = file('subscribeGroups.txt');
 
         foreach ($groups as $value) {
 
-            foreach ($subscribeGroups as $elem) {
-                if ($value == $elem) {
-                    echo("already subscribe");
-                    return;
-                }    
+            if ($this->checkForExistence($value) === FALSE) {
+                $text = $value . PHP_EOL;
+                file_put_contents($file, $text, FILE_APPEND);
+                echo "Subscribe group $value";
+            } else {
+                echo("$value already subscribe");
             }
-            $handle = fopen('subscribeGroups.txt', 'a');
-            fwrite($handle, $value);
-            fclose($handle);
-            echo "Subscribe group $value";
+
         }
+    }
+
+    private function checkForExistence ($group)
+    {
+        $subscribeGroups = file('subscribeGroups.txt');
+
+        return array_search($group, $subscribeGroups);
     }
 
 }

@@ -12,15 +12,25 @@ class Repeat extends Config
 
     public function repeat ()
     {
+        // получение массива групп, на обновления которых подписаны
         $group = file('subscribeGroups.txt');
         
-        foreach($group as $elem) {
-            $stat = $this->getStat (trim($elem));
-            $this->validate ($stat);
+        // проверка каждой группы на новые посты и комментарии
+        if($group){
+            foreach($group as $elem) {
+                $stat = $this->getStat (trim($elem));
+                if(count($stat)){
+                    $this->validate ($stat);
+                } else {
+                    echo "Нет статистики по группе $elem";
+                }
+            }
+        } else {
+            echo "Нет подписанных групп.";
         }
         
     }
-
+    // получение постов группы и количество комментов к каждому из них
     private function getStat ($group) 
     {
 
@@ -41,16 +51,14 @@ class Repeat extends Config
 
         $file = $this->getContent ($queryParams);
 
-        var_dump ($file);
         return $file->topics;
     }
 
+    // определить новые посты и новые комментарии
     private function validate ($stat)
     {
-        // var_dump ($stat);
+        // колмчество постов в группе на данный момент
         $newCount = count($stat);
-        // var_dump ($newCount);
-
 
         // $statistik[$stat[0]->id] = $stat[0]->comments;
         // $statistik[$stat[1]->id] = $stat[1]->comments;
@@ -64,14 +72,16 @@ class Repeat extends Config
 // die;
         $topics = (array)(json_decode(file_get_contents('stat.txt')));
         
-        var_dump ($topics);
+        // колмчество постов в группе при прошлом запросе
         $oldCount = count($topics);
-        var_dump ($oldCount);
 
         if($newCount > $oldCount){
             $count = $newCount - $oldCount;
-            $output = array_slice($stat, 0, $count);
-            $this->getPost ($output);
+            // берём новые посты
+            $newPost = array_slice($stat, 0, $count);
+            $this->getPost ($newPost);
+            // добавить новые посты в stat
+            $this->addNewTopics($newPost);
         } 
 
         // Если счетчик комментов увеличился, то вернуть новый комментарии  
@@ -86,20 +96,20 @@ class Repeat extends Config
         }
     }
 
+    // получает инфо о новых постах
     private function getPost ($newPost)
     {
-
+        // собираем ID новых постов в строку для запроса
         $post = [];
+
         foreach ($newPost as $value) {
             $post[] = $value->id;
         }
         $post = implode($post, ',');
-        var_dump ($post);
 
         $imp = "application_key={$this->applicationKey}fields=media_topic.*format=jsonmethod=mediatopic.getByIdstopic_ids={$post}" . $this->secretKey;
 
         $sig = md5($imp);
-
 
         $queryParams = 
         [
@@ -113,10 +123,11 @@ class Repeat extends Config
         ];
 
         $file = $this->getContent ($queryParams);
-        // добавить новые посты в stat
+
         return $file->media_topics;
     }
 
+    // получение новых комментариев
     private function getComments ($value, $elem)
     {
 
@@ -131,45 +142,43 @@ class Repeat extends Config
             'format' => 'json',
             'method' => 'discussions.getComments',
             'sig' => $sig,
-            'count' => 1,
+            'count' => $count,
             'access_token' => $this->longToken,
             'discussionType' => 'GROUP_TOPIC',
             'discussionId' => $value->id,
         ];
 
-
-        $file = json_decode(file_get_contents($this->methodUrl . http_build_query( $queryParams )));
-
-        var_dump ($file);
+var_dump ($this->longToken);
+        $file = $this->getContent ($queryParams);
  
         $this->writeNewStat ($file);
         return $file;
     }
 
+    // добавляет новые посты в отслеживание (stat)
+    private function addNewTopics ($topics)
+    {
+        $group = (array) json_decode(file_get_contents('stat.txt'));
+
+        foreach($topics as $elem){
+            $group[$elem->id] = $elem->comments;
+        }
+
+        file_put_contents('stat.txt', json_encode($group));
+    }
+
+    // обновление счётчика комментариев
     private function writeNewStat ($discussion)
     {
         $topics = (array)(json_decode(file_get_contents('stat.txt')));
 
         $topics[$discussion->discussionId] += count($discussion->comments);
 
-        // var_dump ($topics);
-
-        $statistik = json_encode($topics);
-
-        // var_dump($statistik);
-
-        $handleStat = fopen('stat.txt', 'w');
-        fwrite($handleStat, $statistik);
-        fclose($handleStat);
+        file_put_contents('stat.txt', json_encode($topics));
     }
 }
 
 $rep = new Repeat();
-
-// while (1){
-//     sleep(3);
-//     $rep->repeat();
-// }
 
 $rep->repeat();
 

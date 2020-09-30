@@ -2,7 +2,7 @@
 
 $clientId = '512000641198';
 $scope = 'VALUABLE_ACCESS;GROUP_CONTENT';
-$clientSecret = '7649E37AB9547FD1E16AD2E3';
+$clientSecret;
 $applicationKey = 'CPKJMOJGDIHBABABA';
 $redirectUri = 'http://ok/login.php';
 $authorizeUrl = 'https://connect.ok.ru/oauth/authorize?';
@@ -26,10 +26,9 @@ class Config
 
     public function __construct ()
     {
-        
+        $this->clientSecret = file_get_contents('clientSecret.txt');
         $this->longToken = file_get_contents('longToken.txt') ? file_get_contents('longToken.txt') : file_get_contents('token.txt');
         $this->secretKey = md5($this->longToken . $this->clientSecret);
-        // var_dump ("qqqq" . $this->longToken);
     }
 
     protected function getContent ($params)
@@ -71,6 +70,8 @@ class Config
         $handleToken = fopen('token.txt', 'w');
         fwrite($handleToken, $accessToken);
         fclose($handleToken);
+        $this->longToken =  file_get_contents('token.txt');
+        $this->secretKey = md5($this->longToken . $this->clientSecret);
     }
 }
 
