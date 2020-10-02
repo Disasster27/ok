@@ -7,7 +7,7 @@ class Authorize extends Config
 {
     public function authorized ()
     {
-        if (file_exists('longToken.txt') && !file_get_contents('longToken.txt')) {
+        if (!file_get_contents('longToken.txt')) {
             if (file_get_contents('refresh.txt')) {
 
                 $this->refreshToken ();
@@ -23,12 +23,12 @@ class Authorize extends Config
                 echo ("<a href='repeat.php'>stat<a/>");
         
             } else {
-        //         // Получаем token по code
-                echo ("<a href='" . getAuthorizeUrl ($clientId, $redirectUri, $scope, $authorizeUrl) . "'>Авторизация через OK.RU</a>");
+                // Получаем token по code
+                echo ("<a href='" . $this->getAuthorizeUrl () . "'>Авторизация через OK.RU</a>");
         
             }
         } else {
-            // $longToken = file_get_contents('longToken.txt');
+
             echo ("<a href='index.php'>Exit</a>
                     <br/>
                     <p>Выберите группу(ы).</p>");
@@ -73,16 +73,16 @@ class Authorize extends Config
      
 
     // Формирование ссылки для авторизации пользователя
-    private function getAuthorizeUrl ($clientId, $redirectUri, $scope, $authorizeUrl)
+    private function getAuthorizeUrl ()
     {
         $params = [
-            'client_id'     => $clientId,
-            'redirect_uri'  => $redirectUri,
+            'client_id'     => $this->clientId,
+            'redirect_uri'  => $this->redirectUri,
             'response_type' => 'code',
             'layout' => 'w', 
-            'scope'         => $scope,
+            'scope'         => $this->scope,
         ];
 
-        return $authorizeUrl . http_build_query( $params );
+        return $this->authorizeUrl . http_build_query( $params );
     }
 }

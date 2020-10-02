@@ -25,7 +25,7 @@ class Config
     protected $secretKey;
 
     public function __construct ()
-    {
+    {  
         $this->clientSecret = file_get_contents('clientSecret.txt');
         $this->longToken = file_get_contents('longToken.txt') ? file_get_contents('longToken.txt') : file_get_contents('token.txt');
         $this->secretKey = md5($this->longToken . $this->clientSecret);

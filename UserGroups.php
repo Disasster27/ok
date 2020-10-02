@@ -29,7 +29,7 @@ class UserGroups extends Config
         ];
 
         // Получение всех групп пользователя
-        $file = json_decode(file_get_contents($this->methodUrl . http_build_query( $queryParams )));
+        $file = $this->getContent ($queryParams);
 
         // Сортировка по статусу ADMIN
         $resArr = array_filter($file->groups, function ($elem) {
@@ -69,8 +69,8 @@ class UserGroups extends Config
             'uids' => $groupsId,
         ];
 
-        $file = json_decode(file_get_contents($this->methodUrl . http_build_query( $queryParams )));
-        var_dump ($file);
+        $file = $this->getContent ($queryParams);
+
         return $file;
     }
 

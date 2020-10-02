@@ -30,13 +30,13 @@ class Repeat extends Config
         }
         
     }
+
     // получение постов группы и количество комментов к каждому из них
     private function getStat ($group) 
     {
 
         $imp = "application_key={$this->applicationKey}fields=COMMENTS,IDformat=jsongid={$group}method=group.getStatTopics" . $this->secretKey;
         $sig = md5($imp);
-
 
         $queryParams = 
         [
@@ -51,6 +51,8 @@ class Repeat extends Config
 
         $file = $this->getContent ($queryParams);
 
+        var_dump ('getStat',$file);
+
         return $file->topics;
     }
 
@@ -60,16 +62,6 @@ class Repeat extends Config
         // колмчество постов в группе на данный момент
         $newCount = count($stat);
 
-        // $statistik[$stat[0]->id] = $stat[0]->comments;
-        // $statistik[$stat[1]->id] = $stat[1]->comments;
-        // $statistik = json_encode($statistik);
-        // var_dump($statistik);
-
-        // $handleStat = fopen('stat.txt', 'w');
-        // fwrite($handleStat, $statistik);
-        // fclose($handleStat);
-        // echo $statistik;
-// die;
         $topics = (array)(json_decode(file_get_contents('stat.txt')));
         
         // колмчество постов в группе при прошлом запросе
@@ -124,6 +116,8 @@ class Repeat extends Config
 
         $file = $this->getContent ($queryParams);
 
+        var_dump ('getPost',$file->media_topics);
+
         return $file->media_topics;
     }
 
@@ -148,9 +142,10 @@ class Repeat extends Config
             'discussionId' => $value->id,
         ];
 
-var_dump ($this->longToken);
         $file = $this->getContent ($queryParams);
- 
+        
+        var_dump ('getComments',$file);
+
         $this->writeNewStat ($file);
         return $file;
     }

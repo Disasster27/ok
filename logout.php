@@ -1,7 +1,6 @@
 <?php
-session_start();
-unset($_SESSION['token']);
-unset($_SESSION['refresh']);
-unset($_SESSION['user']);
-unset($_SESSION['groupId']);
+
+file_put_contents('token.txt', '');
+file_put_contents('refresh.txt', '');
+
 header('location: /');
