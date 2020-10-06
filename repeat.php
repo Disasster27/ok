@@ -12,7 +12,7 @@ class Repeat extends Config
 
     public function repeat ()
     {
-        // получение массива групп, на обновления которых подписаны
+        // получение массива групп, на обновления которых подписаны **из DB
         $group = file('subscribeGroups.txt');
         
         // проверка каждой группы на новые посты и комментарии
@@ -31,7 +31,7 @@ class Repeat extends Config
         
     }
 
-    // получение постов группы и количество комментов к каждому из них
+    // получение постов группы и количество комментов к каждому из них (start_time\end_time )
     private function getStat ($group) 
     {
 
@@ -59,12 +59,13 @@ class Repeat extends Config
     // определить новые посты и новые комментарии
     private function validate ($stat)
     {
-        // колмчество постов в группе на данный момент
+        // DB
+        // количество постов в группе на данный момент
         $newCount = count($stat);
 
         $topics = (array)(json_decode(file_get_contents('stat.txt')));
         
-        // колмчество постов в группе при прошлом запросе
+        // количество постов в группе при прошлом запросе
         $oldCount = count($topics);
 
         if($newCount > $oldCount){
@@ -150,6 +151,7 @@ class Repeat extends Config
         return $file;
     }
 
+    // **объединить два метода
     // добавляет новые посты в отслеживание (stat)
     private function addNewTopics ($topics)
     {
@@ -165,13 +167,15 @@ class Repeat extends Config
     // обновление счётчика комментариев
     private function writeNewStat ($discussion)
     {
-        $topics = (array)(json_decode(file_get_contents('stat.txt')));
+        $topics = (array) json_decode(file_get_contents('stat.txt'));
 
         $topics[$discussion->discussionId] += count($discussion->comments);
 
         file_put_contents('stat.txt', json_encode($topics));
     }
 }
+
+// получать инфо об авторе поста\коммента
 
 $rep = new Repeat();
 

@@ -7,6 +7,7 @@ class Subscribe extends Config
 {
     public function subscribeGroups ($groups)
     {
+        // ** запись в DB
         $file = 'subscribeGroups.txt';
 
         foreach ($groups as $value) {
@@ -29,16 +30,18 @@ class Subscribe extends Config
         return array_search($group, $subscribeGroups);
     }
 
+    // создание Webhook для группы
     private function subscribeWebhook ()
     {
         // нужно получать параметром
-        $tocken = 'tkn1U9dvFMQH5vs3zDAYszK6cEdRGxmHSvZErEogSP2x5tNHiESP5bcOs4r1cIs4ctFE2:CKOMIMJGDIHBABABA';
+        $token = 'tkn1U9dvFMQH5vs3zDAYszK6cEdRGxmHSvZErEogSP2x5tNHiESP5bcOs4r1cIs4ctFE2:CKOMIMJGDIHBABABA';
 
-        $url = 'https://api.ok.ru/graph/me/subscribe?access_token='.$tocken;
+        $url = 'https://api.ok.ru/graph/me/subscribe?access_token='.$token;
         $result = file_get_contents($url, false, stream_context_create(array(
             'http' => array(
                 'method'  => 'POST',
                 'header'  => 'Content-type: application/json',
+                // куда будут доставляться сообщения о событиях в чатах
                 'content' => '{"url": "http://ok/webhook.php"}'
             )
         )));
@@ -47,8 +50,11 @@ class Subscribe extends Config
 
 }
 
+// **вынести логику
+
 // group subscription 
 if ($_REQUEST) {
+    var_dump ($_REQUEST);
     $groups = array_keys($_REQUEST);
 
     $subscribe = new Subscribe ();

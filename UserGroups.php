@@ -38,14 +38,17 @@ class UserGroups extends Config
                 return $elem;
             };
         });
-      
+
+        if (!count($resArr)) {
+            throw new Exception('No administered groups');
+        }
+
         return $resArr;
     }
 
     // Возвращает ID и названием групп администрируемых пользователем
     private function getGroupInfo ($groupArr) : array
     {
-
         $groupsIdArr = [];
 
         foreach($groupArr as $value) {
@@ -74,6 +77,7 @@ class UserGroups extends Config
         return $file;
     }
 
+    // **вынести в view
     private function render ($userGroups)
     {
         echo ("<form action='subscribe.php' method='post'>");
@@ -87,3 +91,5 @@ class UserGroups extends Config
         </form>');
     }
 }
+
+// **нужно отдавать id групп на front

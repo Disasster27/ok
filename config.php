@@ -1,15 +1,5 @@
 <?php
 
-$clientId = '512000641198';
-$scope = 'VALUABLE_ACCESS;GROUP_CONTENT';
-$clientSecret;
-$applicationKey = 'CPKJMOJGDIHBABABA';
-$redirectUri = 'http://ok/login.php';
-$authorizeUrl = 'https://connect.ok.ru/oauth/authorize?';
-$methodUrl = 'https://api.ok.ru/fb.do?';
-$tokenUrl = 'https://api.ok.ru/oauth/token.do?';
-$longToken = file_get_contents('longToken.txt');
-$secretKey = md5($longToken . $clientSecret);
 
 class Config
 {
@@ -17,7 +7,7 @@ class Config
     protected $scope = 'VALUABLE_ACCESS;GROUP_CONTENT';
     protected $clientSecret = '7649E37AB9547FD1E16AD2E3';
     protected $applicationKey = 'CPKJMOJGDIHBABABA';
-    protected $redirectUri = 'http://ok/login.php';
+    protected $redirectUri = 'http://ok/index.php';
     protected $authorizeUrl = 'https://connect.ok.ru/oauth/authorize?';
     protected $methodUrl = 'https://api.ok.ru/fb.do?';
     protected $tokenUrl = 'https://api.ok.ru/oauth/token.do?';
@@ -74,5 +64,3 @@ class Config
         $this->secretKey = md5($this->longToken . $this->clientSecret);
     }
 }
-
-session_start();
